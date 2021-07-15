@@ -1,0 +1,72 @@
+Microfrontends (MFEs)
+  Overview:
+    Divide a montolithic app into multiple, smaller apps
+    Each smaller app is responsible for a distinct feature of the product
+  Benefits:
+    Mutliple teams can build them working in isolation
+    Each smaller app is easier to understand and make changes to
+  Integration
+    How and when the container gets access to source code for other MFEs
+    No single solution, each has pros and cons
+    Types:
+      Build time integration - Container gets access to MFE before loaded in browser
+        Usually handled by creating packages for MFEs and installing them in the container
+        Pro: Easy to set up and understand
+        Con: Container must be redeployed every time MFE is updated, tempting to tightly couple MFEs
+      Run time integration - Container gets access to MFE after loaded in browser
+        Usually handled by bundling and deploying code to static URL which is then fetched by container
+        Pro: MFEs can be deployed independently at any time, different versions of MFEs can be deployed at once
+        Con: Tooling and setup far more complicated
+      Server integration - Server decides whether to include MFE when sending container
+
+  Each MFE will have these files: index.js, index.html, package.json, webpack.config.js
+
+
+Webpack
+  Takes a file and all its dependencies and converts it into a single JS file
+  Dependencies -> index.js -> Webpack -> main.js (also commonly named bundle.js)
+  Moves an entire file into an eval statement
+
+
+Webpack Dev Server
+  Takes output from webpack process and makes it available in browser
+
+
+HtmlWebpackPlugin
+  Takes output from webpack process and adds it as script tags in root html file
+
+
+Module Federation
+  Host (container) and Remote (mfes)
+  Decide which files in Host you want to get from Remote
+  With ModuleFederationPlugin in Remote, Webpack makes two sets of files: 
+    the standard main.js (so we can still run it standalone)
+    the set of files needed (examples below)
+      remoteEntry.js - contains list of files available in project and directions on how to load them
+      src_index_js.js - Version of src/index.js that can be safely loaded into the browser (processed by Webpack)
+      faker - Version of faker that can be safely loaded into the browser (processed by Webpack)
+  With ModuleFederationPlugin in Host, Webpack:
+    creates main.js from index.js (index.js only imports bootstrap, this gives webpack the opportunity to fetch code from remotes)
+    creates bootstrap.js
+  Steps:
+    1. main.js loaded and executed
+    2. we need to load and execute bootstrap.js
+    3. bootstrap.js needs remoteEntry.js (bootstrap and remoteEntry loaded simultaneously)
+    4. remoteEntry.js tells us we need src_index_js and faker (they are loaded simultaneously)
+    5. After retrieving all, execute bootstrap.js
+  Dependencies
+    Only need to load common dependencies once
+    If dependency semantic versioning is different, loads both versions
+    Some dependencies cannot be loaded more than once (e.g. React) - must define as singleton and must ensure same versions across MFEs
+  
+  Note: module name cannot match element id - browser tries to make a variable for the element and conflicts with the module
+
+
+App Overview
+  Marketing (Home Page, Pricing Page), Authentication (Sign In Page, Sign Up Page), Dashboard (Dashboard Page)
+  Requirements:
+    Zero coupling between child projects - No importing of functions/objects/classes/etc from other MFEs, no shared state, shared libraries is OK
+    Near zero coupling between container and chlid apps - Container shouldn't assume a child is using a particular framework, any communication done with callbacks or simple events
+    CSS from one project should never affect another
+    Version control shouldn't have any impact on overall project 
+    Container should be able to decide to always use EITHER the latest version OR a specific version on a MFE
