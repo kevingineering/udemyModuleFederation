@@ -1,3 +1,6 @@
+// injects script tags into html file
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
 module.exports = {
   module: {
     rules: [
@@ -17,5 +20,11 @@ module.exports = {
         }
       }
     ]
-  }
+  },
+  // looks at files coming out of webpack process and adds them in script tags in public/index.html
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './public/index.html'
+    })
+  ]
 }

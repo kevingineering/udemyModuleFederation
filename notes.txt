@@ -62,11 +62,41 @@ Module Federation
   Note: module name cannot match element id - browser tries to make a variable for the element and conflicts with the module
 
 
-App Overview
-  Marketing (Home Page, Pricing Page), Authentication (Sign In Page, Sign Up Page), Dashboard (Dashboard Page)
-  Requirements:
-    Zero coupling between child projects - No importing of functions/objects/classes/etc from other MFEs, no shared state, shared libraries is OK
-    Near zero coupling between container and chlid apps - Container shouldn't assume a child is using a particular framework, any communication done with callbacks or simple events
-    CSS from one project should never affect another
-    Version control shouldn't have any impact on overall project 
-    Container should be able to decide to always use EITHER the latest version OR a specific version on a MFE
+App Requirements:
+  Zero coupling between child projects - No importing of functions/objects/classes/etc from other MFEs, no shared state, shared libraries is OK
+  Near zero coupling between container and chlid apps - Container shouldn't assume a child is using a particular framework, any communication done with callbacks or simple events
+  CSS from one project should never affect another
+  Version control shouldn't have any impact on overall project 
+  Container should be able to decide to always use EITHER the latest version OR a specific version on a MFE
+
+
+Deployment Reqyirements
+  Each MFE must be able to be deployed independently
+  Location of child app remoteEntry.js must be known at container build time
+  We need a service that will allow you to deploy multiple projects at once
+  Need a CI/CD pipeline
+  We need to think about remoteEntry.js being fixed and how this affects caching
+
+
+Github
+  Monorepo with all projects
+  If any project changes, build a prod version of it with webpack and upload the file to Amazon S3
+  Steps:
+    Create repo on Github
+    Create local repo with .gitignore
+    Push code
+    Set up the webpack prod config
+    Set up CI/CD pipeline.
+
+
+GithubActions (.github/workflows/*)
+  Events - Push code, create pull request, every 15 minutes, create issue, close issue, etc
+  After event, run all workflows associated with that event
+  One workflow for each service: whenever code is committed to the master branch AND the commit contains a change to the container folder
+  Virtual machine will:
+    cd into project folder
+    install dependencies
+    create a prod build using webpack
+    upload result to AWS S3
+
+
