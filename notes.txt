@@ -100,3 +100,19 @@ GithubActions (.github/workflows/*)
     upload result to AWS S3
 
 
+MFE CSS Scoping
+  Must avoid clashing styles - tags with styles for one MFE that shouldn't apply to a different MFE
+  Options:
+    Custom CSS
+      Use a CSS-in-JS library
+      Use Vue/Angular's built in component style scoping
+      "Namespace" all your CSS (.auth h1 {}) - can be broken if someone accidentally styles just an h1
+    CSS from library
+      Use a library that does CSS-in-JS (e.g. Material-UI) - do not deliberately share CSS libraries between projects
+      Manualy build the css library and apply namespacing techniques to it
+
+  Class Collisions in Prod
+    CSS-in-JS libaries make randomly generated class names to avoid collisions
+    Prod deployments optimize CSS by extracting CSS into single stylesheet and shortening classnames (like jss1, jss2, ... jssn)
+    Multiple deployments end up having same names (jss1, jss2)
+    Collisions occur
