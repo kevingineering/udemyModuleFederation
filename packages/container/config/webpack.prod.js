@@ -24,7 +24,7 @@ const prodConfig = {
         // key marketing: load the file at the listed URL if anything in the container has an import like "import abc from 'marketing'"
         // value marketing: related to the 'name' property in the marketing webpack.config.js file
         // value URL: URL for remoteEntry file
-        marketing: `marketing@${domain}/marketing/remoteEntry.js`
+        marketing: `marketing@${domain}/marketing/latest/remoteEntry.js`
       },
       // automatically adds all dependencies here so they are shared
       // may not be a good idea if you want specific versioning between packages

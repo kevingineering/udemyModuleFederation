@@ -9,9 +9,11 @@ const domain = process.env.PRODUCTION_DOMAIN
 const prodConfig = {
   // production mode minifies JS and optimizes build
   mode: 'production',
-  // ensures files use this as a naming template - name of file and hash of file contents - primarily done for caching
   output: {
-    filename: '[name].[contenthash].js'
+    // ensures files use this as a naming template - name of file and hash of file contents - primarily done for caching
+    filename: '[name].[contenthash].js',
+    // used by webpack to refer to another file that has been built by webpack - prepends filename with this path
+    publicPath: '/marketing/latest/'
   },
   plugins: [
     // currently identical to common but could easily be different
