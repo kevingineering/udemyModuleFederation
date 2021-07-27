@@ -12,6 +12,10 @@ const devConfig = {
     // navigation property
     historyApiFallback: true
   },
+  output: {
+    // used by webpack to refer to another file that has been built by webpack - prepends filename with this path
+    publicPath: 'http://localhost:8080/'
+  },
   plugins: [
     new ModuleFederationPlugin({
       // name is not required for host, but it's included for clarity
@@ -21,7 +25,8 @@ const devConfig = {
         // key marketing: load the file at the listed URL if anything in the container has an import like "import abc from 'marketing'"
         // value marketing: related to the 'name' property in the marketing webpack.config.js file
         // value URL: URL for remoteEntry file
-        marketing: 'marketing@http://localhost:8081/remoteEntry.js'
+        marketing: 'marketing@http://localhost:8081/remoteEntry.js',
+        auth: 'auth@http://localhost:8082/remoteEntry.js'
       },
       // automatically adds all dependencies here so they are shared
       // may not be a good idea if you want specific versioning between packages

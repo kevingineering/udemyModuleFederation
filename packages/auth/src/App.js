@@ -2,23 +2,27 @@ import React from 'react'
 import { Switch, Route, Router } from 'react-router-dom'
 import { StylesProvider, createGenerateClassName } from '@material-ui/core/styles'
 
-import Landing from './components/Landing'
-import Pricing from './components/Pricing'
+import Signin from './components/Signin'
+import Signup from './components/Signup'
 
 // helps keep classnames legitimately different - see notes on CSS Scoping
 const generateClassName = createGenerateClassName({
-  productionPrefix: 'marketing'
+  productionPrefix: 'auth'
 })
 
-const App = ({ history }) => {
+const App = ({ history, onSignIn }) => {
   return (
     <div>
       {/* Ensures that generated styles are different between MFEs */}
       <StylesProvider generateClassName={generateClassName}>
         <Router history={history}>
           <Switch>
-            <Route exact path='/pricing' component={Pricing} />
-            <Route path='/' component={Landing} />
+            <Route path='/auth/signin'>
+              <Signin onSignIn={onSignIn} />
+            </Route>
+            <Route path='/auth/signup'>
+              <Signup onSignIn={onSignIn} />
+            </Route>
           </Switch>
         </Router>
       </StylesProvider>

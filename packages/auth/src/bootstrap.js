@@ -4,7 +4,7 @@ import { createMemoryHistory, createBrowserHistory } from 'history'
 import App from './App'
 
 // Mount function to start up the app
-const mount = (element, { onNavigate, defaultHistory, initialPath }) => {
+const mount = (element, { onNavigate, defaultHistory, initialPath, onSignIn }) => {
   // History for use with routing - only have default history if in isolation
   const history =
     defaultHistory ||
@@ -17,7 +17,7 @@ const mount = (element, { onNavigate, defaultHistory, initialPath }) => {
     history.listen(onNavigate)
   }
 
-  ReactDOM.render(<App history={history} />, element)
+  ReactDOM.render(<App history={history} onSignIn={onSignIn} />, element)
 
   return {
     onParentNavigate({ pathname: nextPathname }) {
@@ -30,7 +30,7 @@ const mount = (element, { onNavigate, defaultHistory, initialPath }) => {
 
 // If in dev and therefore isolation, call mount immediately
 if (process.env.NODE_ENV === 'development') {
-  const element = document.getElementById('dev-marketing')
+  const element = document.getElementById('dev-auth')
   if (element) {
     // if in isolation, uses browser history - allows us to see navigation which wouldn't be possible with memory history
     mount(element, { defaultHistory: createBrowserHistory() })

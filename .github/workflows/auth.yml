@@ -1,0 +1,48 @@
+name: deploy-auth
+
+# workflow starts when ...
+on:
+  # code is pushed ...
+  push:
+    # to the master branch ...
+    branches:
+      - master
+    # inside the auth app
+    paths:
+      - 'packages/auth/**'
+
+# set execution environment to inside auth directory
+defaults:
+  run:
+    working-directory: packages/auth
+
+jobs:
+  # build and deploy project
+  build:
+    # pick virtual machine
+    runs-on: ubuntu-latest
+    steps:
+      # load code into VM environment
+      - uses: actions/checkout@v2
+      # install dependencies
+      - run: npm install
+      # webpack build
+      - run: npm run build
+      # get access to AWS CLI
+      - uses: shinyinc/action-aws-cli@v1.2
+      # use AWS CLI's s3 feature to sync contents of dist directory with specified S3 bucket
+      # ${{ }} are encrypted secrets set on github
+      - run: aws s3 sync dist s3://${{ secrets.AWS_S3_BUCKET_NAME }}/auth/latest
+        # access key and secret key are essentially username and password for AWS
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-2'
+      # cloudfront only pulls files from s3 that have changed names
+      # JS files have different hashes so are always pulled in, but remoteEntry.js always has the same name (even though the scripts inside of it change)
+      # below we add an invalidation to ensure the remoteEntry.js page is always updated
+      - run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_DISTRIBUTION_ID }} --paths "/auth/latest/remoteEntry.js"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-2'

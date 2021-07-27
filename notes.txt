@@ -112,7 +112,36 @@ MFE CSS Scoping
       Manualy build the css library and apply namespacing techniques to it
 
   Class Collisions in Prod
-    CSS-in-JS libaries make randomly generated class names to avoid collisions
-    Prod deployments optimize CSS by extracting CSS into single stylesheet and shortening classnames (like jss1, jss2, ... jssn)
-    Multiple deployments end up having same names (jss1, jss2)
-    Collisions occur
+    1. CSS-in-JS libaries make randomly generated class names to avoid collisions
+    2. Prod deployments optimize CSS by extracting CSS into single stylesheet and shortening classnames (like jss1, jss2, ... jssn)
+    3. Multiple deployments end up having same names (jss1, jss2)
+    4. Collisions occur
+  To fix: 
+    Use StyleProvider with generated classname that adds prefix to start of class name 
+
+
+Navigation Requirements:
+  Both container and individual sub apps need routing features
+  Sub apps may need to add in new pages/routes - shouldn't require a redeploy of the container
+  We may need to show multiple MFEs on the screen at the same time
+  We want to use an off-the-shelf routing solution
+  We need navigation in sub apps in both isolation and the container
+  If apps need to communicate information about routing, it should be done in as generic a fashion as possible
+
+  How Routing Libraries Work
+    History - Object to gete and set the current path the user is visiting
+      Three types:
+        Browser History - Looks at path portion of URL (everything after domain)
+        Hash History - Looks at everything after the # in the URL to figure out path
+        Memory / Abstract History - Keeps track of current path in memory - Initial value always '/'
+      Commonly use Browser History in container and memory history in MFEs
+      This means multiple histories are created
+    Router - Shows different content based on the current path
+
+    If user clicks link in:
+      container - communicate down to sub apps and update their memory histories
+      sub app - communicate up to container and update its browser history
+
+
+Auth
+  Auth app is for signing in/up users

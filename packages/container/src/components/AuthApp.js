@@ -1,13 +1,12 @@
 import React, { useRef, useEffect } from 'react'
-import { mount } from 'marketing/MarketingApp'
+import { mount } from 'auth/AuthApp'
 import { useHistory } from 'react-router-dom'
 
-export default () => {
+export default ({ onSignIn }) => {
   const ref = useRef(null)
   const history = useHistory()
 
   useEffect(() => {
-    console.log(ref.current)
     const { onParentNavigate } = mount(ref.current, {
       initialPath: history.location.pathname,
       // location object provided by history in MFEs has pathname key-value pair
@@ -17,7 +16,9 @@ export default () => {
           // navigate to new path
           history.push(nextPathname)
         }
-      }
+      },
+      // called when user logs in or signs up
+      onSignIn
     })
 
     // tell sub app the container had a navigation event

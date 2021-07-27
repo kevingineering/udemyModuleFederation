@@ -1,30 +1,31 @@
-// function that allows us to merge two different webpack config objects
 const { merge } = require('webpack-merge')
 const commonConfig = require('./webpack.common')
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin')
 const packageJson = require('../package.json')
 
-const devConfig = {
-  mode: 'development',
-  // allows webpack-dev-server to serve this file on this port
-  devServer: {
-    port: 8081,
-    // navigation property
-    historyApiFallback: true
-  },
+// environment variable from CI/CD pipeline
+const domain = process.env.PRODUCTION_DOMAIN
+
+const prodConfig = {
+  // production mode minifies JS and optimizes build
+  mode: 'production',
   output: {
+    // ensures files use this as a naming template - name of file and hash of file contents - primarily done for caching
+    filename: '[name].[contenthash].js',
     // used by webpack to refer to another file that has been built by webpack - prepends filename with this path
-    publicPath: 'http://localhost:8081/'
+    publicPath: '/auth/latest/'
   },
   plugins: [
+    // currently identical to common but could easily be different
     new ModuleFederationPlugin({
-      name: 'marketing',
+      // name is not required for host, but it's included for clarity
+      name: 'auth',
       // sets the name of the manifest file - should be remoteEntry.js unless a good reason not to be
       // manifest file contains list of files available in project and directions on how to load them
       filename: 'remoteEntry.js',
       exposes: {
         // aliases filenames
-        './MarketingApp': './src/bootstrap'
+        './AuthApp': './src/bootstrap'
       },
       // automatically adds all dependencies here so they are shared
       // may not be a good idea if you want specific versioning between packages
@@ -33,5 +34,4 @@ const devConfig = {
   ]
 }
 
-// devConfig should be second so it can override options if duplicated
-module.exports = merge(commonConfig, devConfig)
+module.exports = merge(commonConfig, prodConfig)
